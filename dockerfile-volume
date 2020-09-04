@@ -1,0 +1,5 @@
+FROM tomcat:8
+VOLUME /usr/local/tomcat
+ADD https://war-jar-vn.s3.amazonaws.com/gameoflife.war /usr/local/tomcat/webapps 
+EXPOSE 8080
+CMD ["catalina.sh" ,"run"]
