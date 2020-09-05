@@ -1,7 +1,22 @@
 FROM maven:3-openjdk-8 as build
 LABEL info=build-gol
 RUN apt-get update && apt-get install git -y && git clone https://github.com/wakaleo/game-of-life.git && cd game-of-life && mvn package
-FROM tomcat:8 as Deploy
+FROM tomcat:8 
 COPY --from=build game-of-life/gameoflife-web/target/gameoflife.war /usr/local/tomcat/webapps
 EXPOSE 8080
 CMD ["catalina.sh", "run"]  
+
+
+
+clone code
+build war file
+deploy application
+
+1. mutliple FROM instructions in single dockerfile
+2. storage optimize
+
+
+
+MSBUILD -- build .net application
+Nuget -- package manager
+
