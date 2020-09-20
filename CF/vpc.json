@@ -1,10 +1,14 @@
 {
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Parameters" : { 
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
         "VPCcidr": {
             "Type": "String",
             "Default": "192.168.0.0/16",
-            "AllowedValues": ["192.168.0.0/16","10.0.0.0/16","172.17.0.0/16"]
+            "AllowedValues": [
+                "192.168.0.0/16",
+                "10.0.0.0/16",
+                "172.17.0.0/16"
+            ]
         },
         "PublicSubnetcidr": {
             "Type": "String",
@@ -13,212 +17,217 @@
         "PrivateSubnetcidr": {
             "Type": "String",
             "Default": "192.168.1.0/24"
-        } ,
+        },
         "Keyname": {
             "Type": "AWS::EC2::KeyPair::KeyName",
             "Default": "ubuntu"
         }
     },
-     
-    "Resources" : {
+    "Resources": {
         "mynetwork": {
-            "Type" : "AWS::EC2::VPC",
-            "Properties" : {
-                "CidrBlock" : 
-                { "Ref": "VPCcidr" }
-                ,
-                "EnableDnsHostnames" : true,
-                "Tags" : [ {
-                    "Key": "Name" ,
-                    "Value": "VPC"
-                } ]
-              }
-          },
-          
-          "igwmynetwork": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": {
+                    "Ref": "VPCcidr"
+                },
+                "EnableDnsHostnames": true,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "VPC"
+                    }
+                ]
+            }
+        },
+        "igwmynetwork": {
             "Type": "AWS::EC2::InternetGateway",
             "Properties": {
-              "Tags": [{
-                  "Key": "Name",
-                  "Value": "IGW"
-              }]
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "IGW"
+                    }
+                ]
             }
-          },
-          "AttachGateway": {
+        },
+        "AttachGateway": {
             "Type": "AWS::EC2::VPCGatewayAttachment",
             "Properties": {
-              "VpcId": 
-              { "Ref": "mynetwork" },
-              
-              "InternetGatewayId": { "Ref": "igwmynetwork" }
+                "VpcId": {
+                    "Ref": "mynetwork"
+                },
+                "InternetGatewayId": {
+                    "Ref": "igwmynetwork"
+                }
             }
-          } ,
-          
-          "PublicRT": {
+        },
+        "PublicRT": {
             "Type": "AWS::EC2::RouteTable",
             "Properties": {
-              "VpcId": 
-              { "Ref": "mynetwork" }
-              ,
-              "Tags": [{
-                  "Key":"Name",
-                  "Value": "PublicRT"
-              }]
+                "VpcId": {
+                    "Ref": "mynetwork"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "PublicRT"
+                    }
+                ]
             }
-          } ,
-          
-          "routeName": {
+        },
+        "routeName": {
             "Type": "AWS::EC2::Route",
             "Properties": {
-              "RouteTableId": 
-              { "Ref": "PublicRT" }
-              ,
-              "DestinationCidrBlock": "0.0.0.0/0",
-              "GatewayId": 
-              { "Ref": "igwmynetwork" }
-              
+                "RouteTableId": {
+                    "Ref": "PublicRT"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "igwmynetwork"
+                }
             }
-          } ,
-          
-          "PrivateRT": {
+        },
+        "PrivateRT": {
             "Type": "AWS::EC2::RouteTable",
             "Properties": {
-              "VpcId": 
-              { "Ref": "mynetwork" }
-              ,
-              "Tags": [{
-                  "Key":"Name" ,
-                  "Value": "PrivateRT"
-              }]
+                "VpcId": {
+                    "Ref": "mynetwork"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "PrivateRT"
+                    }
+                ]
             }
-          } ,
-          
-          "PublicSubnet": {
+        },
+        "PublicSubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-              "AvailabilityZone": "us-east-1a",
-              "VpcId": 
-              { "Ref": "mynetwork" }
-              ,
-              "CidrBlock": 
-              { "Ref": "PublicSubnetcidr" }
-              ,
-              "Tags": [{
-                "Key":"Name" ,
-                "Value": "Pblicsubnet"
-            }]
+                "AvailabilityZone": "us-east-1a",
+                "VpcId": {
+                    "Ref": "mynetwork"
+                },
+                "CidrBlock": {
+                    "Ref": "PublicSubnetcidr"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Pblicsubnet"
+                    }
+                ]
             }
-          } ,
-          
-          "routeTableAssocName": {
+        },
+        "routeTableAssocName": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
-              "SubnetId": 
-              { "Ref": "PublicSubnet" }
-              ,
-              "RouteTableId": 
-              { "Ref": "PublicRT" }
-              
+                "SubnetId": {
+                    "Ref": "PublicSubnet"
+                },
+                "RouteTableId": {
+                    "Ref": "PublicRT"
+                }
             }
-          } ,
-          
-          "Privatesubnet": {
+        },
+        "Privatesubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-              "AvailabilityZone": "us-east-1b",
-              "VpcId": 
-              { "Ref": "mynetwork" }
-              ,
-              "CidrBlock": 
-              { "Ref": "PrivateSubnetcidr" }
-              ,
-              "Tags": [{
-                "Key":"Name" ,
-                "Value": "Privatesubnet"
-            }]
+                "AvailabilityZone": "us-east-1b",
+                "VpcId": {
+                    "Ref": "mynetwork"
+                },
+                "CidrBlock": {
+                    "Ref": "PrivateSubnetcidr"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Privatesubnet"
+                    }
+                ]
             }
-          },
-          
-          "routeTableAssocName1": {
+        },
+        "routeTableAssocName1": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
-              "SubnetId": 
-              { "Ref": "Privatesubnet" }
-              ,
-              "RouteTableId": 
-              { "Ref": "PrivateRT" }
-              
+                "SubnetId": {
+                    "Ref": "Privatesubnet"
+                },
+                "RouteTableId": {
+                    "Ref": "PrivateRT"
+                }
             }
-          },
-          
-          "openall" : {
-            "Type" : "AWS::EC2::SecurityGroup",
-            "Properties" : {
-              "GroupDescription" : "open all security groups",
-              "SecurityGroupIngress" : [ 
-                {
-                    "IpProtocol" : "-1",
-                    "CidrIp" : "0.0.0.0/0"
-                 }
-              ],
-              "SecurityGroupEgress" : [{
-                "IpProtocol" : "-1",
-                "CidrIp" : "0.0.0.0/0"
-             }] ,
-              "VpcId" : 
-              { "Ref": "mynetwork" }
-              ,
-              "Tags" :  [ {
-                "Key":"Name" ,
-                "Value": "openall"
-            } ]
+        },
+        "openall": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "open all security groups",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ],
+                "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "-1",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "mynetwork"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "openall"
+                    }
+                ]
             }
-          },
-          
-          "webserver": {
-              "Type": "AWS::EC2::Instance",
-              "Properties": {
-                  "KeyName": 
-                  { "Ref": "Keyname" }
-                  ,
-                  "ImageId": "ami-0817d428a6fb68645",
-                  "InstanceType": "t2.micro",
-                  "NetworkInterfaces": [ {
-                    "AssociatePublicIpAddress": "true",
-                    "DeviceIndex": "0",
-                    "GroupSet": [{ "Ref" : "openall" }],
-                    "SubnetId": { "Ref" : "PublicSubnet" }
-                  } ],
-                  "Tags": [
-                      {
-                          "Key": "Name",
-                          "Value": "webserver"
-                      }
-                  ],
-                  "UserData": {
-                      "Fn::Base64": {
-                          "Fn::Join": [
-                              "\n",
-                              [
-                                  "#!/bin/bash",
-                                  "sudo apt-get update",
-                                  "sudo apt-get install apache2 -y",
-                                  "sudo apt-get install tomcat8 -y"
-                              ]
-                          ]
-                      }
-                  }
-          }
-                  }
-          
-          
-          
-
-          
-          
-          
-          
-          
-          
-      }
+        },
+        "webserver": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": {
+                    "Ref": "Keyname"
+                },
+                "ImageId": "ami-0817d428a6fb68645",
+                "InstanceType": "t2.micro",
+                "NetworkInterfaces": [
+                    {
+                        "AssociatePublicIpAddress": "true",
+                        "DeviceIndex": "0",
+                        "GroupSet": [
+                            {
+                                "Ref": "openall"
+                            }
+                        ],
+                        "SubnetId": {
+                            "Ref": "PublicSubnet"
+                        }
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "webserver"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "#!/bin/bash",
+                                "sudo apt-get update",
+                                "sudo apt-get install apache2 -y",
+                                "sudo apt-get install tomcat8 -y"
+                            ]
+                        ]
+                    }
+                }
+            }
+        }
+    }
 }
