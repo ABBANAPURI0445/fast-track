@@ -1,10 +1,32 @@
 {
     "AWSTemplateFormatVersion" : "2010-09-09",
+    "Parameters" : { 
+        "VPCcidr": {
+            "Type": "String",
+            "Default": "192.168.0.0/16",
+            "AllowedValues": ["192.168.0.0/16","10.0.0.0/16","172.17.0.0/16"]
+        },
+        "PublicSubnetcidr": {
+            "Type": "String",
+            "Default": "192.168.0.0/24"
+        },
+        "PrivateSubnetcidr": {
+            "Type": "String",
+            "Default": "192.168.1.0/24"
+        } ,
+        "Keyname": {
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "Default": "ubuntu"
+        }
+    },
+     
     "Resources" : {
         "mynetwork": {
             "Type" : "AWS::EC2::VPC",
             "Properties" : {
-                "CidrBlock" : "192.168.0.0/16",
+                "CidrBlock" : 
+                { "Ref": "VPCcidr" }
+                ,
                 "EnableDnsHostnames" : true,
                 "Tags" : [ {
                     "Key": "Name" ,
@@ -78,7 +100,9 @@
               "VpcId": 
               { "Ref": "mynetwork" }
               ,
-              "CidrBlock": "192.168.0.0/24",
+              "CidrBlock": 
+              { "Ref": "PublicSubnetcidr" }
+              ,
               "Tags": [{
                 "Key":"Name" ,
                 "Value": "Pblicsubnet"
@@ -105,7 +129,9 @@
               "VpcId": 
               { "Ref": "mynetwork" }
               ,
-              "CidrBlock": "192.168.1.0/24",
+              "CidrBlock": 
+              { "Ref": "PrivateSubnetcidr" }
+              ,
               "Tags": [{
                 "Key":"Name" ,
                 "Value": "Privatesubnet"
@@ -152,7 +178,9 @@
           "webserver": {
               "Type": "AWS::EC2::Instance",
               "Properties": {
-                  "KeyName": "ubuntu",
+                  "KeyName": 
+                  { "Ref": "Keyname" }
+                  ,
                   "ImageId": "ami-0817d428a6fb68645",
                   "InstanceType": "t2.micro",
                   "NetworkInterfaces": [ {
