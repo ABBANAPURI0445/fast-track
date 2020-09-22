@@ -21,6 +21,29 @@
         "Keyname": {
             "Type": "AWS::EC2::KeyPair::KeyName",
             "Default": "ubuntu"
+        },
+        "PublicsubnetAZ": {
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+        "privatesubnetAZ": {
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        }
+
+    },
+    "Mappings": {
+        "RegionMap": {
+            "us-east-1": {
+                "HVM64": "ami-0817d428a6fb68645"
+            },
+            "us-east-2": {
+                "HVM64": "ami-0e82959d4ed12de3f"
+            },
+            "us-west-1": {
+                "HVM64": "ami-03fac5402e10ea93b"
+            },
+            "us-west-2": {
+                "HVM64": "ami-07a29e5e945228fa1"
+            }
         }
     },
     "Resources": {
@@ -104,7 +127,9 @@
         "PublicSubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-                "AvailabilityZone": "us-east-1a",
+                "AvailabilityZone": 
+                { "Ref": "PublicsubnetAZ" }
+                ,
                 "VpcId": {
                     "Ref": "mynetwork"
                 },
@@ -133,7 +158,9 @@
         "Privatesubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-                "AvailabilityZone": "us-east-1b",
+                "AvailabilityZone": 
+                { "Ref": "privatesubnetAZ" }
+                ,
                 "VpcId": {
                     "Ref": "mynetwork"
                 },
@@ -192,7 +219,15 @@
                 "KeyName": {
                     "Ref": "Keyname"
                 },
-                "ImageId": "ami-0817d428a6fb68645",
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "HVM64"
+                    ]
+                },
                 "InstanceType": "t2.micro",
                 "NetworkInterfaces": [
                     {
@@ -227,6 +262,39 @@
                         ]
                     }
                 }
+            }
+        }
+    },
+    "Outputs": {
+        "InstanceID": {
+            "Description": "The Instance ID",
+            "Value": {
+                "Ref": "webserver"
+            }
+        },
+        "PublicIp": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "webserver",
+                    "PublicIp"
+                ]
+            },
+            "Description": "webServer's PublicIp Address"
+        },
+        "VPCID": {
+            "Value": {
+                "Ref": "mynetwork"
+            },
+            "Description": "webServer's PublicIp Address"
+        },
+        "Publicsubnetid": {
+            "Value": {
+                "Ref": "PublicSubnet"
+            }
+        },
+        "PrivateSubnetid": {
+            "Value": {
+                "Ref": "Privatesubnet"
             }
         }
     }
