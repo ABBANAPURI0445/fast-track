@@ -28,7 +28,6 @@
         "privatesubnetAZ": {
             "Type": "AWS::EC2::AvailabilityZone::Name"
         }
-
     },
     "Mappings": {
         "RegionMap": {
@@ -127,9 +126,9 @@
         "PublicSubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-                "AvailabilityZone": 
-                { "Ref": "PublicsubnetAZ" }
-                ,
+                "AvailabilityZone": {
+                    "Ref": "PublicsubnetAZ"
+                },
                 "VpcId": {
                     "Ref": "mynetwork"
                 },
@@ -158,9 +157,9 @@
         "Privatesubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
-                "AvailabilityZone": 
-                { "Ref": "privatesubnetAZ" }
-                ,
+                "AvailabilityZone": {
+                    "Ref": "privatesubnetAZ"
+                },
                 "VpcId": {
                     "Ref": "mynetwork"
                 },
